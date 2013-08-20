@@ -37,6 +37,7 @@ require.config({
             'lightbox',
             'log',
             'login',
+            'mktapp-prompt',
             'models',
             'navigation',
             'outgoing_links',
@@ -117,7 +118,7 @@ require.config({
         };
         if (capabilities.webApps) {
             var get_installed_debounced = _.debounce(get_installed, 2000, true);  // Immediate so there's no delay.
-    
+
             z.page.on('loaded', get_installed);
             z.page.on('fragment_loaded loaded_more', get_installed_debounced);
             document.addEventListener(

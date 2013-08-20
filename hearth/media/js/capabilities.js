@@ -37,8 +37,7 @@ define('capabilities', [], function() {
         } else {
             return 'desktop';
         }
-    }
+    };
 
     return static_caps;
-
 });

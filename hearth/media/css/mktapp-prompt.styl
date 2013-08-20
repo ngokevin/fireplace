@@ -1,0 +1,46 @@
+@import 'lib';
+
+#mktapp-prompt {
+    background: $dark-gray;
+    color: $light-gray;
+    display: none;
+    height: 88px;
+    padding-top: 15px;
+    position: relative;
+    width: 100%;
+    .prompt-text {
+        border-right: 1px solid $medium-gray;
+        margin: 0 auto;
+        left: 18px;
+        position: relative;
+        width: 195px;
+        &:before {
+            background-image: url(../img/logos/64.png);
+            content: ' ';
+            display: block;
+            height: 64px;
+            left: -71px;
+            position: absolute;
+            top: -3px;
+            width: 64px;
+        }
+    }
+    .prompt-close {
+        background-image: url(../img/icons/close.png);
+        background-repeat: no-repeat;
+        bottom: 40px
+        display: block;
+        height: 22px;
+        left: 140px;
+        margin: 0 auto;
+        position: relative;
+        width: 22px;
+    }
+}
+
+@media (min-width: 710px) {
+    #mktapp-prompt {
+        bottom: 47px;
+        margin-bottom: 0;
+    }
+}

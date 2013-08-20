@@ -6,6 +6,7 @@ var contains = a.contains;
 var mock = a.mock;
 var defer = require('defer');
 
+
 function MockNavigator(no_package) {
     var def = this.def = defer.Deferred();
     function installer(url, data) {
@@ -26,14 +27,30 @@ function MockNavigator(no_package) {
         });
         return robj;
     }
+    function getInstalled(url) {
+        var robj = {
+            result: null
+        };
+        def.done(function(result) {
+            robj.result = [{
+                manifestURL: 'foo.bar?baz=qux'
+            }];
+            if (robj.onsuccess) {
+                robj.onsuccess.apply(this);
+            }
+        });
+        return robj;
+    }
     this.mozApps = {
         install: installer,
-        installPackage: installer
+        installPackage: installer,
+        getInstalled: getInstalled
     };
     if (no_package) {
         this.mozApps.installPackage = undefined;
     }
 }
+
 
 test('apps.install', function(done, fail) {
     mock(
@@ -316,6 +333,43 @@ test('apps.incompat platform and webapps', function(done, fail) {
             // Only return the first one. Both don't make sense.
             eq_(results.length, 1);
             eq_(results[0], 'Your browser or device is not web-app compatible.');
+            done();
+        },
+        fail
+    );
+});
+
+
+test('apps.checkInstalled true', function(done, fail) {
+    mock(
+        'apps',
+        {defer: defer},
+        function(apps) {
+            var nav = new MockNavigator();
+            r = apps.checkInstalled('foo.bar', nav)
+            r.done(function(app) {
+                assert(app);
+                eq_(app.manifestURL, 'foo.bar?baz=qux');
+            });
+            nav.def.resolve();
+            done();
+        },
+        fail
+    );
+});
+
+
+test('apps.checkInstalled false', function(done, fail) {
+    mock(
+        'apps',
+        {defer: defer},
+        function(apps) {
+            var nav = new MockNavigator();
+            r = apps.checkInstalled('baz.bar.foo', nav)
+            r.done(function(app) {
+                assert(!app);
+            });
+            nav.def.resolve();
             done();
         },
         fail

@@ -2,44 +2,44 @@
     Provides the apps module, a wrapper around navigator.mozApps
 */
 define('apps',
-    ['buckets', 'capabilities', 'defer', 'l10n', 'log', 'nunjucks', 'settings', 'underscore', 'utils'],
+    ['buckets', 'capabilities', 'defer', 'l10n', 'log', 'nunjucks', 'settings',
+     'underscore', 'utils'],
     function(buckets, capabilities, defer, l10n, log, nunjucks, settings, _, utils) {
     'use strict';
 
     var gettext = l10n.gettext;
-
     var console = log('apps');
 
     /*
+        apps.install(manifest_url, options)
+        apps.installPackage(manifest_url, options)
 
-    apps.install(manifest_url, options)
-    apps.installPackage(manifest_url, options)
+        It's just like navigator.apps.install with the following enhancements:
+        - If navigator.apps.install doesn't exist, an error is displayed
+        - If the install resulted in errors, they are displayed to the user
 
-    It's just like navigator.apps.install with the following enhancements:
-    - If navigator.apps.install doesn't exist, an error is displayed
-    - If the install resulted in errors, they are displayed to the user
+        This requires at least one apps-error-msg div to be present.
 
-    This requires at least one apps-error-msg div to be present.
+        See also: https://developer.mozilla.org/docs/DOM/Apps.install
 
-    See also: https://developer.mozilla.org/docs/DOM/Apps.install
+        The recognized option attributes are as follows:
 
-    The recognized option attributes are as follows:
-
-    data
-        Optional dict to pass as navigator.apps.install(url, data, ...)
-    success
-        Optional callback for when app installation was successful
-    error
-        Optional callback for when app installation resulted in error
-    navigator
-        Something other than the global navigator, useful for testing
-
+        data
+            Optional dict to pass as navigator.apps.install(url, data, ...)
+        success
+            Optional callback for when app installation was successful
+        error
+            Optional callback for when app installation resulted in error
+        navigator
+            Something other than the global navigator, useful for testing
     */
     function install(product, opt) {
         opt = opt || {};
         var manifest_url;
         if (product.manifest_url) {
-            manifest_url = utils.urlparams(product.manifest_url, {feature_profile: buckets.get_profile()});
+            manifest_url = utils.urlparams(
+                product.manifest_url,
+                {feature_profile: buckets.get_profile()});
         }
 
         var def = defer.Deferred();
@@ -50,24 +50,29 @@ define('apps',
 
         // Try to install the app.
         if (manifest_url && mozApps && mozApps[installer]) {
-            var installRequest = mozApps[installer](manifest_url, opt.data || {});
+            var installRequest = mozApps[installer](manifest_url,
+                                                    opt.data ||{});
             installRequest.onsuccess = function() {
                 console.log('App installation successful for', product.name);
                 var status;
                 var isInstalled = setInterval(function() {
                     status = installRequest.result.installState;
                     if (status == 'installed') {
-                        console.log('App reported as installed for', product.name);
+                        console.log('App reported as installed for',
+                                    product.name);
                         clearInterval(isInstalled);
                         def.resolve(installRequest.result, product);
                     }
                 }, 250);
             };
             installRequest.onerror = function() {
+                alert(this.error.name);
                 if (this.error.name === 'DENIED') {
-                    def.reject();  // Don't return a message when the user cancels install.
+                    // Don't return a message when the user cancels install.
+                    def.reject();
                 } else {
-                    def.reject(gettext('App install error: {error}', {error: this.error.name || this.error}));
+                    def.reject(gettext('App install error: {error}',
+                               {error: this.error.name || this.error}));
                 }
             };
         } else {
@@ -90,18 +95,19 @@ define('apps',
         return def.promise();
     }
 
+
     /*
-    apps.incompat(app_object)
+        apps.incompat(app_object)
 
-    If the app is compatible, this function returns a falsey value.
-    If the app is incompatible, a list of reasons why (plaintext strings) is returned.
+        If the app is compatible, this function returns a falsey value.
+        If the app is incompatible, a list of reasons why (plaintext strings)
+        is returned.
 
-    If you don't want to use the cached values, run the following command in your console:
+        If you don't want to use the cached values, run the following command
+        in your console:
 
-        require('apps')._use_compat_cache(false);
-
+            require('apps')._use_compat_cache(false);
     */
-
     var COMPAT_REASONS = '__compat_reasons';
     var use_compat_cache = true;
     function incompat(product) {
@@ -133,9 +139,53 @@ define('apps',
     }
     nunjucks.require('globals').app_incompat = incompat;
 
+
+    /*
+        apps.checkInstalled(url)
+
+        Given an app's manifestURL, check whether the app is installed.
+        Includes query param trimming over navigator.mozApps.checkInstalled.
+        checkInstalled has strange same-origin policies.
+
+        url
+            manifest url
+        _navigator
+            Something other than the global navigator, useful for testing.
+    */
+    function checkInstalled(url, _navigator) {
+        var def = defer.Deferred();
+
+        // Select navigator.
+        _navigator = _navigator || window.navigator;
+        if (!_navigator.mozApps) {
+            // Mostly for tests to pass.
+            def.reject();
+            return def.promise();
+        }
+        var mozApps = _navigator.mozApps;
+
+        var r = mozApps.getInstalled();
+        r.onsuccess = function() {
+            _.each(r.result, function(app) {
+                // Loop over installed apps.
+                if (app.manifestURL.split('?')[0] == url) {
+                    // If found, resolve and pass the app into the promise.
+                    def.resolve(app);
+                }
+            });
+            def.resolve(false);
+        };
+        r.onerror = function() {
+            def.reject();
+        };
+        return def.promise();
+    }
+
+
     return {
         incompat: incompat,
         install: install,
+        checkInstalled: checkInstalled,
         _use_compat_cache: function(val) {use_compat_cache = val;}
     };
 });

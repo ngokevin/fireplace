@@ -15,6 +15,7 @@ define('settings', ['l10n', 'settings_local', 'underscore'], function(l10n, sett
         init_module: 'marketplace',
         default_locale: 'en-US',
         api_url: 'http://' + window.location.hostname,  // No trailing slash, please.
+        mkt_packaged_url: 'https://marketplace.firefox.com/packaged.webapp',
 
         // The version number for localStorage data. Bump when the schema for
         // storing data in localStorage changes.
