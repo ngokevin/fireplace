@@ -216,7 +216,10 @@
                 {{ content_rating.rating_label }}&plus;
               </span>
             </div>
-            <p class="description">{{ content_rating.rating }}</p>
+            {% if content_rating.body_label != 'classind' %}
+              {# CLASSIND doesn't want to show rating name. #}
+              <p class="description">{{ content_rating.rating }}</p>
+            {% endif %}
           </div>
         </div>
         {% if content_rating.body_label == 'pegi' and this.descriptors %}
