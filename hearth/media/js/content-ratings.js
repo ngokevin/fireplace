@@ -86,7 +86,8 @@ define('content-ratings', ['urls'], function(urls) {
     };
 
     // Language icons.
-    if (window.navigator.l10n.language == 'es') {
+    if (['en-US', 'ca'].indexOf(window.navigator.l10n.language) !== -1) {
+        // Show ESRB spanish icons for non-English speaking countries.
         rating_icons.esrb = {
             '0': _rating_path('esrb_e_spa.png'),
             '10': _rating_path('esrb_e10_spa.png'),
