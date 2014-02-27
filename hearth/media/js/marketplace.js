@@ -15,8 +15,11 @@ require.config({
         'templates': '../../templates',
         'settings': ['settings_local', 'settings'],
         'format': 'lib/format',
-        'textoverflowclamp': 'lib/textoverflowclamp'
-    }
+        'textoverflowclamp': 'lib/textoverflowclamp',
+
+        'hammerjs': 'lib_local/hammer',
+        'jquery.hammer': 'lib_local/jquery.hammer'
+    },
 });
 
 define(
@@ -32,12 +35,12 @@ define(
         'mobilenetwork',  // Must come before cat-dropdown (for amd.js)
         'cat-dropdown',
         'forms',
-        'header',
         'l10n',
         'lightbox',
         'log',
         'login',
         'models',
+        'navbar',
         'navigation',
         'outgoing_links',
         'overlay',
@@ -70,6 +73,11 @@ function(_) {
     var nunjucks_globals = require('nunjucks').require('globals');
     nunjucks_globals.REGIONS = settings.REGION_CHOICES_SLUG;
     nunjucks_globals.user_helpers = require('user_helpers');
+    nunjucks_globals.indexOf = function(col, item) {
+        if (col) {
+            return col.indexOf(item);
+        }
+    };
 
     // Jank hack because Persona doesn't allow scripts in the doc iframe.
     // Please just delete it when they don't do that anymore.
