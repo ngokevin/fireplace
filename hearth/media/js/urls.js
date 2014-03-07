@@ -77,7 +77,15 @@ define('urls',
         if (path[0] === '/') {
             path = path.substr(1);
         }
-        return media_url + path;
+        var src = media_url + path
+
+        // Add cachebusting.
+        var buildId = document.body.getAttribute('data-build-id-js');
+        if (buildId) {
+            src += '?build=' + buildId;
+        }
+
+        return src;
     }
 
     return {
