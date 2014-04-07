@@ -1,14 +1,11 @@
-define('forms', ['z'], function(z) {
+define('forms', ['jquery', 'z'], function($, z) {
 
     function checkValid(form) {
         if (form) {
             $(form).filter(':not([novalidate])').find('button[type=submit]').attr('disabled', !form.checkValidity());
         }
     }
-    // Note 'input' event is required for FF android (bug 977642)
-    z.body.on('change input', 'input, textarea', function(e) {
-        checkValid(e.target.form);
-    }).on('change', 'select', function(e) {
+    z.body.on('change keyup paste', 'input, select, textarea', function(e) {
         checkValid(e.target.form);
     }).on('loaded decloak', function() {
         $('form:not([novalidate])').each(function() {

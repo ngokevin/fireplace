@@ -10,7 +10,6 @@ define('navigation',
         {path: '/', type: 'root'}
     ];
     var initialized = false;
-    var scrollTimer;
 
     function extract_nav_url(url) {
         // This function returns the URL that we should use for navigation.
@@ -22,10 +21,9 @@ define('navigation',
             return url;
         }
 
-        // We can't use urlparams() because that only extends, not replaces.
         var used_params = _.pick(utils.querystring(url), settings.param_whitelist);
-        var queryParams = utils.urlencode(used_params);
-        return utils.baseurl(url) + (queryParams.length ? '?' + queryParams : '');
+        // We can't use urlparams() because that only extends, not replaces.
+        return utils.baseurl(url) + '?' + utils.urlencode(used_params);
     }
 
     function canNavigate() {
@@ -70,16 +68,8 @@ define('navigation',
             }
             top = state.scrollTop;
         }
-
-        // Introduce small delay to ensure content
-        // is ready to scroll. (Bug 976466)
-        if (scrollTimer) {
-            window.clearTimeout(scrollTimer);
-        }
-        scrollTimer = window.setTimeout(function() {
-            console.log('Setting scroll to', top);
-            window.scrollTo(0, top);
-        }, 250);
+        console.log('Setting scroll to', top);
+        window.scrollTo(0, top);
 
         // Clean the path's parameters.
         // /foo/bar?foo=bar&q=blah -> /foo/bar?q=blah
@@ -199,7 +189,7 @@ define('navigation',
                 el.getAttribute('rel') === 'external';
     }
 
-    z.body.on('click', 'a', function(e) {
+    z.doc.on('click', 'a', function(e) {
         var href = this.getAttribute('href');
         var $elm = $(this);
         var preserveScrollData = $elm.data('preserveScroll');
@@ -223,50 +213,18 @@ define('navigation',
         }
         var state = e.originalEvent.state;
         if (state) {
-            if (state.closeModalName) {
-                console.log('popstate closing modal');
-                cleanupModal(state.closeModalName);
-            } else {
-                console.log('popstate navigate');
-                navigate(state.path, true, state);
-            }
+            console.log('popstate navigate');
+            navigate(state.path, true, state);
         }
     }).on('submit', 'form', function() {
         console.error("Form submissions are not allowed.");
         return false;
     });
 
-    function modal(name) {
-        console.log('Opening modal', name);
-        stack[0].closeModalName = name;
-        history.replaceState(stack[0], false, stack[0].path);
-        history.pushState(null, name, '#' + name);
-        var path = window.location.href + '#' + name;
-        stack.unshift({path: path, type: 'modal', name: name});
-    }
-
-    function cleanupModal(name) {
-        stack.shift();
-        delete stack[0].closeModalName;
-        z.win.trigger('closeModal', name);
-    }
-
-    function closeModal(name) {
-        if (stack[0].type === 'modal' && stack[0].name === name) {
-            console.log('Closing modal', name);
-            history.back();
-        } else {
-            console.log('Attempted to close modal', name, 'that was not open');
-        }
-    }
-
     return {
         'back': back,
-        'modal': modal,
-        'closeModal': closeModal,
         'stack': function() {return stack;},
-        'navigationFilter': navigationFilter,
-        'extract_nav_url': extract_nav_url
+        'navigationFilter': navigationFilter
     };
 
 });

@@ -33,8 +33,7 @@ define('utils', ['jquery', 'l10n', 'underscore'], function($, l10n, _) {
             var $cc = $(this);
             $cc.closest('form')
                .find('#' + $cc.data('for'))
-               // Note 'input' event is need for FF android see (bug 976262)
-               .on('input blur', _.throttle(function() {countChars(this, $cc);}, 250))
+               .on('keyup blur', _.throttle(function() {countChars(this, $cc);}, 250))
                .trigger('blur');
         });
     }
@@ -180,13 +179,6 @@ define('utils', ['jquery', 'l10n', 'underscore'], function($, l10n, _) {
         return 'other';
     }
 
-    var a = document.createElement('a');
-
-    function urlparse(url) {
-        a.href = url;
-        return a;
-    }
-
     return {
         '_pd': _pd,
         'baseurl': baseurl,
@@ -201,7 +193,6 @@ define('utils', ['jquery', 'l10n', 'underscore'], function($, l10n, _) {
         'slugify': slugify,
         'urlencode': urlencode,
         'urlparams': urlparams,
-        'urlparse': urlparse,
         'urlunparam': urlunparam,
         'translate': translate
     };
