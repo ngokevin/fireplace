@@ -36,9 +36,9 @@
     "tr": {},
     "zh-TW": {}
   },
-  "name": "Marketplace",
+  "name": "Inferno",
   "orientation": ["portrait-primary"],
-  "origin": "app://marketplace.firefox.com",
+  "origin": "app://inferno.marketplace.firefox.com",
   "permissions": {
     "mobilenetwork": {
       "description": "To detect mobile carrier and regional information."
