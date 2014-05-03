@@ -27,6 +27,7 @@ define(
         'underscore',
         'jquery',
         'helpers',  // Must come before mostly everything else.
+        'helpers_local',
         'buttons',
         'cache',
         'capabilities',
