@@ -1,6 +1,6 @@
 /* This is a shared file between Fireplace and Transonic. */
 define('feed',
-    ['l10n', 'models', 'nunjucks', 'utils_local'], function(l10n, models, nunjucks, utils_local) {
+    ['l10n', 'models', 'nunjucks', 'underscore', 'utils_local'], function(l10n, models, nunjucks, _, utils_local) {
     'use strict';
     var gettext = l10n.gettext;
 
@@ -70,7 +70,7 @@ define('feed',
 
     var BRAND_LAYOUTS_CHOICES = utils_local.items(BRAND_LAYOUTS);
 
-    var BRAND_COLOR_CLASSES = [
+    var BRAND_COLORS = [
         'ruby',
         'amber',
         'emerald',
@@ -110,10 +110,42 @@ define('feed',
         return BRAND_TYPES[item.type][0];
     }
 
-    function get_brand_color_class() {
-        // Return random item from BRAND_COLOR_CLASSES array.
-        var seed = Math.floor(Math.random() * BRAND_COLOR_CLASSES.length);
-        return BRAND_COLOR_CLASSES[seed];
+    function get_brand_color_class(brand) {
+        /*
+        Passed the JSON representation of an editorial brand, returns a random
+        CSS class to be used to colorify that brand's display.
+        */
+
+        function identifier(brand) {
+            // Generate a unique identifier from the brand.
+            var brand_id = brand.type;
+            _.each(brand.apps, function(app) {
+                brand_id += '_' + app.slug
+            });
+            return brand_id;
+        }
+
+        function charcode_sum(str) {
+            // Sum the charcodes of each character in a passed string.
+            var sum = 0;
+            for(var i = 0, length = str.length; i < length; i++) {
+                sum += str.charCodeAt(i);
+            }
+            return sum;
+        }
+
+        function seeded_random(seed) {
+            // Generate a seeded random float between 0 and 1 using the passed
+            // integer as a seed.
+            var rand = Math.sin(seed++) * 10000;
+            return rand - Math.floor(rand);
+        }
+
+        var brand_id = identifier(brand);
+        var seed = charcode_sum(brand_id);
+        var random = seeded_random(seed);
+
+        return BRAND_COLORS[Math.floor(random * BRAND_COLORS.length)];
     }
 
     function group_apps(apps) {
