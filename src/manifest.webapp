@@ -41,7 +41,7 @@
   },
   "name": "Marketplace",
   "orientation": ["portrait-primary"],
-  "origin": "app://packaged.marketplace.firefox.com",
+  "origin": "{fireplace_origin}",
   "permissions": {
     "mobilenetwork": {
       "description": "To detect mobile carrier and regional information."
