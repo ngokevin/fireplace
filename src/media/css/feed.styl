@@ -133,10 +133,6 @@ $vertical-tile-margin = 10px;  // Vertical space between feed tiles.
     height: 100%;
     position: relative;
     width: 100%;
-
-    &:hover, :active {
-        text-decoration: none;
-    }
 }
 
 .feed-app {
@@ -177,14 +173,6 @@ $vertical-tile-margin = 10px;  // Vertical space between feed tiles.
                 height: 240px;
             }
         }
-        .feed-app-preview {
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: contain;
-            height: unquote('calc(100% - 10px)');  // Padding.
-            margin-top: 5px;
-            width: 100%;
-        }
     }
     .tile-footer {
         border-radius: 0 0 5px 5px;
@@ -198,6 +186,15 @@ $vertical-tile-margin = 10px;  // Vertical space between feed tiles.
             position: relative;
         }
     }
+}
+
+.feed-app-preview {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: unquote('calc(100% - 10px)');  // Padding.
+    margin-top: 5px;
+    width: 100%;
 }
 
 // Editorial brands.
@@ -224,7 +221,6 @@ $vertical-tile-margin = 10px;  // Vertical space between feed tiles.
 
         &:hover {
             border: none;
-            text-decoration: none;
         }
     }
     .feed-tile-header {
@@ -893,3 +889,22 @@ $vertical-tile-margin = 10px;  // Vertical space between feed tiles.
 .collection-landing-listing .desc {
     border-radius: 5px;
 }
+
+.fanchor,
+.app-link {
+    &:hover,
+    &:active {
+        text-decoration: none;
+    }
+}
+
+/*  Give loadmore button its own row. Leaves ugly gaps though.
+.loadmore.feed-item-item {
+    max-width: 100%;
+    width: 100%;
+
+    button {
+        width: $mobile-tile-width;
+    }
+}
+*/
