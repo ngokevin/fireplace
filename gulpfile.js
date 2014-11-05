@@ -19,7 +19,6 @@ requireDir(config.GULP_SRC_PATH);
 //*****************
 // Fireplace stuff.
 // - Package build
-// - Docker setup
 //*****************
 var fs = require('fs');
 
@@ -96,13 +95,21 @@ gulp.task('package',
 
 
 gulp.task('js_build_package', ['packaged_settings', 'templates_build_sync'], function() {
-    // JS build that excludes the settings_local in the src directory and
-    // instead uses the built settings_local_package.
-    var js = marketplaceGulp.paths.js;
-    js.push('!' + config.JS_DEST_PATH + 'settings_local.js');
-    js.push(TMP_PATH + 'settings_local.js');
-    return marketplaceGulp.jsBuild(gulp.src(js))
-        .pipe(gulp.dest(latestPackageFolder + 'media/js'));
+    // JS build that points to the packaged settings, outputs to the package
+    // directory, and generates a sourcemap unique to the package.
+    var paths = config.requireConfig.paths;
+    paths.settings_local = '../../../' + TMP_PATH + 'settings_local';
+
+    return marketplaceGulp.jsBuild({
+        out: latestPackageFolder + 'media/js',
+        paths: paths,
+        uglify2: {
+            options: {
+                sourceMap: 'maps/include-' + versionTimestamp + '.js.map',
+                sourceMappingURL: 'maps/include-' + versionTimestamp+ '.js.map',
+            }
+        }
+    });
 });
 
 
