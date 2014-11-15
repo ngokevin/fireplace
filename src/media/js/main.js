@@ -162,7 +162,7 @@ function(_) {
     });
 
     if (capabilities.webApps) {
-        document.addEventListener('visibilitychange', function() {
+        var uninstalledAppCheck = function() {
             if (!document.hidden) {
                 // Refresh list of installed apps in case user uninstalled apps
                 // and switched back.
@@ -171,7 +171,9 @@ function(_) {
                 }
                 apps.getInstalled().done(buttons.mark_btns_as_uninstalled);
             }
-        }, false);
+        };
+        document.addEventListener('visibilitychange', uninstalledAppCheck, true);
+        document.addEventListener('focus', uninstalledAppCheck, true);
     }
 
     // Do some last minute template compilation.
