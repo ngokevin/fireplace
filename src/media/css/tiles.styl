@@ -13,7 +13,7 @@ $app-title-size = 20px;
 // Currently used in author truncation.
 $greater-than-mobile = unquote('(min-width: 330px)');
 
-// base class
+// Base class.
 .mkt-tile {
     color: $castle-skull-gray;
     display: block;
@@ -42,7 +42,7 @@ $greater-than-mobile = unquote('(min-width: 330px)');
     }
     .author {
         line-height: 18px;
-        width: 120px;
+        max-width: 115px;
     }
     .heading,
     .info {
@@ -177,8 +177,12 @@ $greater-than-mobile = unquote('(min-width: 330px)');
 }
 
 @media $greater-than-mobile {
-    .mkt-tile .author {
-        width: auto;
+    .detail .mkt-tile .author,
+    .search-listing .author {
+        max-width: none;
+    }
+    .app-list-page .author {
+        max-width: 150px;
     }
 }
 
@@ -209,9 +213,6 @@ $greater-than-mobile = unquote('(min-width: 330px)');
             .info {
                 padding-left: $detail-icon-size + 10;
             }
-        }
-        .author {
-            width: auto;
         }
     }
 }
