@@ -377,6 +377,16 @@ for region in $regions
     }
 }
 
+// Remove weird focus outlines and borders.
+body {
+    :focus,
+    :active,
+    ::-moz-focus-inner {
+        border: 0;
+        outline: none;
+    }
+}
+
 /* For Firefox for Android. */
 button:not([disabled]):active,
 input:not([disabled]):active,
