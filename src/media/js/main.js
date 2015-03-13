@@ -9,8 +9,12 @@ console.log('');
 console.log('64K High Memory Area is available.');
 
 define('main', ['routes', 'settings_app'], function() {
-require(['init'], function() {
+require(['core/init'], function() {
 require([
+    'document-register-element',
+    'helpers_local',
+    'route_api_args',
+    'user_helpers',
     'underscore',
     'jquery',
     'apps_buttons',
@@ -78,6 +82,10 @@ require([
     var gettext = l10n.gettext;
 
     logger.log('Package version: ' + (settings.package_version || 'N/A'));
+
+    rewriters.forEach(function(rewriter) {
+        cache.addRewriter(rewriter);
+    });
 
     if (capabilities.device_type() === 'desktop') {
         z.body.addClass('desktop');
