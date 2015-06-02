@@ -32,8 +32,10 @@ define('header_footer',
             return;
         }
 
-        $(nunjucks.env.render('_includes/platform_selector.html'))
-            .insertBefore('#page');
+        z.page.on('compat-filter--ready', function() {
+            $(nunjucks.env.render('_includes/platform_selector.html'))
+                .insertBefore('#page');
+        });
     }
 
     function renderBanners() {

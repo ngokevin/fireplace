@@ -39,29 +39,45 @@ define('compat_filter',
     // Don't do device filtering for these endpoints.
     var EXCLUDE_DEVICE_FILTER_ENDPOINTS = ['feed-app'];
 
-    var DEVICE_CHOICES = {
-        '': gettext('All Platforms'),
-        'android-mobile': gettext('Android Mobile'),
-        'android-tablet': gettext('Android Tablet'),
-        'desktop': gettext('Desktop'),
-        'firefoxos': gettext('Firefox OS'),
-    };
+    var DEVICE_CHOICES;
+    var DEVICE_FILTER_CHOICES;
+    setDeviceChoices();
 
-    // Calculate device filter choices.
-    var DEVICE_FILTER_CHOICES = [
-        ['all', gettext('All Platforms')]
-    ];
-    if (caps.firefoxOS || caps.firefoxAndroid) {
-        DEVICE_FILTER_CHOICES.splice(1, 0, [caps.device_type(),
-                                            gettext('My Device')]);
-    } else {
-        DEVICE_FILTER_CHOICES = DEVICE_FILTER_CHOICES.concat([
-            ['desktop', gettext('Desktop')],
-            ['firefoxos', gettext('Firefox OS')],
-            ['android-mobile', gettext('Android Mobile')],
-            ['android-tablet', gettext('Android Tablet')]
-        ]);
+    function setDeviceChoices() {
+        DEVICE_CHOICES = {
+            '': gettext('All Platforms'),
+            'android-mobile': gettext('Android Mobile'),
+            'android-tablet': gettext('Android Tablet'),
+            'desktop': gettext('Desktop'),
+            'firefoxos': gettext('Firefox OS'),
+        };
+
+        // Calculate device filter choices.
+        DEVICE_FILTER_CHOICES = [
+            ['all', gettext('All Platforms')]
+        ];
+        if (caps.firefoxOS || caps.firefoxAndroid) {
+            DEVICE_FILTER_CHOICES.splice(1, 0, [caps.device_type(),
+                                                gettext('My Device')]);
+        } else {
+            DEVICE_FILTER_CHOICES = DEVICE_FILTER_CHOICES.concat([
+                ['desktop', gettext('Desktop')],
+                ['firefoxos', gettext('Firefox OS')],
+                ['android-mobile', gettext('Android Mobile')],
+                ['android-tablet', gettext('Android Tablet')]
+            ]);
+        }
     }
+
+    var l10nInterval = setInterval(function() {
+        if (window.navigator.l10n) {
+            clearInterval(l10nInterval);
+            setTimeout(function() {
+                setDeviceChoices();
+                z.page.trigger('compat-filter--ready');
+            }, 50);
+        }
+    }, 1000);
 
     var actualPlatform = caps.device_platform();
     var actualFormFactor = caps.device_formfactor();
@@ -148,8 +164,12 @@ define('compat_filter',
     });
 
     return {
-        DEVICE_CHOICES: DEVICE_CHOICES,
-        DEVICE_FILTER_CHOICES: DEVICE_FILTER_CHOICES,
+        getDeviceChoices: function() {
+            return DEVICE_CHOICES;
+        },
+        getDeviceFilterChoices: function() {
+            return DEVICE_FILTER_CHOICES;
+        },
         apiArgs: apiArgs,
         featureProfile: featureProfile,
         getFilterDevice: getFilterDevice,
