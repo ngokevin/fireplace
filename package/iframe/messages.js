@@ -28,40 +28,43 @@ define('messages', ['logger', 'settings'],
         activitiesToSend.push(msg);
     }
 
-    window.addEventListener('message', function(e) {
-        // Receive postMessage from the iframe contents and do something with it.
-        logger.log('Handled post message from ' + e.origin + ': ' + JSON.stringify(e.data));
-        if (e.origin !== settings.MKT_URL) {
-            logger.log('Ignored post message from ' + e.origin + ': ' + JSON.stringify(e.data));
-            return;
-        }
-        if (e.data === 'loaded') {
-            logger.log('Preparing to send activities ...');
-            sendActivities();
-        } else if (e.data.type === 'fxa-watch') {
-            logger.log('Registering FxA callbacks');
-            navigator.mozId.watch({
-                wantIssuer: 'firefox-accounts',
-                loggedInUser: e.data.email,
-                onready: function() {},
-                onlogin: function(a) {logger.log('fxa-login'); postMessage({type: 'fxa-login', assertion: a});},
-                onlogout: function() {logger.log('fxa-logout'); postMessage({type: 'fxa-logout'});}
-            });
-        } else if (e.data.type === 'fxa-request') {
-            navigator.mozId.request({oncancel: function(){postMessage({type: 'fxa-cancel'});}});
-        } else if (e.data.type == 'activity-result' && e.data.id && activitiesInProgress[e.data.id]) {
-            logger.log('Posting back result for activity id:', e.data.id);
-            activitiesInProgress[e.data.id].postResult(e.data.result);
-            delete activitiesInProgress[e.data.id];
-        } else if (e.data.type == 'activity-error' && e.data.id && activitiesInProgress[e.data.id]) {
-            logger.log('Posting back error for activity id:', e.data.id);
-            activitiesInProgress[e.data.id].postError(e.data.result);
-            delete activitiesInProgress[e.data.id];
-        }
-    }, false);
+    function install() {
+        window.addEventListener('message', function(e) {
+            // Receive postMessage from the iframe contents and do something with it.
+            logger.log('Handled post message from ' + e.origin + ': ' + JSON.stringify(e.data));
+            if (e.origin !== settings.MKT_URL) {
+                logger.log('Ignored post message from ' + e.origin + ': ' + JSON.stringify(e.data));
+                return;
+            }
+            if (e.data === 'loaded') {
+                logger.log('Preparing to send activities ...');
+                sendActivities();
+            } else if (e.data.type === 'fxa-watch') {
+                logger.log('Registering FxA callbacks');
+                navigator.mozId.watch({
+                    wantIssuer: 'firefox-accounts',
+                    loggedInUser: e.data.email,
+                    onready: function() {},
+                    onlogin: function(a) {logger.log('fxa-login'); postMessage({type: 'fxa-login', assertion: a});},
+                    onlogout: function() {logger.log('fxa-logout'); postMessage({type: 'fxa-logout'});}
+                });
+            } else if (e.data.type === 'fxa-request') {
+                navigator.mozId.request({oncancel: function(){postMessage({type: 'fxa-cancel'});}});
+            } else if (e.data.type == 'activity-result' && e.data.id && activitiesInProgress[e.data.id]) {
+                logger.log('Posting back result for activity id:', e.data.id);
+                activitiesInProgress[e.data.id].postResult(e.data.result);
+                delete activitiesInProgress[e.data.id];
+            } else if (e.data.type == 'activity-error' && e.data.id && activitiesInProgress[e.data.id]) {
+                logger.log('Posting back error for activity id:', e.data.id);
+                activitiesInProgress[e.data.id].postError(e.data.result);
+                delete activitiesInProgress[e.data.id];
+            }
+        }, false);
+    }
 
     return {
         activitiesInProgress: activitiesInProgress,
+        install: install,
         queueMessage: queueMessage,
     };
 });

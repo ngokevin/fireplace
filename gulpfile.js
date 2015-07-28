@@ -51,7 +51,7 @@ var iframePackageFilesWhitelist = [
     // index.html not included since it is written straight to package folder.
     // Locale files will be dynamically whitelisted later.
     'package/iframe/app-icons/*.png',
-    'package/iframe/*.js',
+    'package/iframe/require.js',
     'package/iframe/*.css',
 ];
 var IFRAME_SRC_PATH = path.join('package', 'iframe');

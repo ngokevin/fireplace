@@ -98,11 +98,11 @@ require(
             typeof navigator.getFeature !== 'undefined') {
             logger.log('navigator.getFeature and window.Promise available');
             features.generateFeatureProfile().then(function(profile) {
-                buildIframe(profile);
+                launchIframe(profile);
             });
         } else {
             logger.log('navigator.getFeature or window.Promise unavailable :(');
-            buildIframe();
+            launchIframe();
         }
 
         // When refocussing the app, toggle the iframe based on `navigator.onLine`.
@@ -115,16 +115,13 @@ require(
         }, false);
     }
 
-    function buildIframe(profile) {
-        // Add the iframe with the actual Marketplace to the document.
-        var iframeSrc = settings.MKT_URL + '/?' + buildQS(profile);
-        var i = document.createElement('iframe');
-        i.seamless = true;
-        i.onerror = function() {
+    function launchIframe(profile) {
+        // Set the iframe src to the actual Marketplace.
+        var iframe = document.getElementById('iframe');
+        iframe.onerror = function() {
             document.body.classList.add('offline');
         };
-        i.src = iframeSrc;
-        document.body.appendChild(i);
+        iframe.src = settings.MKT_URL + '/?' + buildQS(profile);
     }
 
     function toggleOffline(init) {
@@ -142,4 +139,9 @@ require(
             }
         }
     }
+
+    // Set up messages and activities late in order to load the iframe as
+    // quickly as possible.
+    messages.install();
+    activities.install();
 })();
