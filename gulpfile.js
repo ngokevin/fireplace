@@ -48,11 +48,11 @@ var packageFilename = server + '_' + versionTimestamp;
 var versionPackageZip = PKG_PATH + packageFilename + '.zip';
 
 var iframePackageFilesWhitelist = [
-    // include.js not included since it is written straight to package folder.
+    // index.html not included since it is written straight to package folder.
     // Locale files will be dynamically whitelisted later.
     'package/iframe/app-icons/*.png',
-    'package/iframe/index.html',
-    'package/iframe/style.css',
+    'package/iframe/*.js',
+    'package/iframe/*.css',
 ];
 var IFRAME_SRC_PATH = path.join('package', 'iframe');
 var iframeLatestPackageFolder = PKG_PATH + '_iframe_' + server + '/';
@@ -221,7 +221,7 @@ gulp.task('watch_package', function() {
 });
 
 
-gulp.task('iframe_package', ['iframe_package_js', 'iframe_package_manifest',
+gulp.task('iframe_package', ['iframe_package_html', 'iframe_package_manifest',
                              'iframe_whitelist_copy'], function() {
     [iframeLatestPackageZip, iframeVersionPackageZip].forEach(function(outputZipName) {
         zipPackage(iframeLatestPackageFolder, outputZipName);
@@ -247,9 +247,9 @@ gulp.task('iframe_whitelist_copy', ['iframe_package_clean'], function() {
 });
 
 
-gulp.task('iframe_package_js', ['iframe_package_clean'], function() {
-    // Build iframe package JS. Swap in the correct domain.
-    return gulp.src(path.join(IFRAME_SRC_PATH, 'main.js'))
+gulp.task('iframe_package_html', ['iframe_package_clean'], function() {
+    // Build iframe package HTML. Swap in the correct domain.
+    return gulp.src(path.join(IFRAME_SRC_PATH, 'index.html'))
         .pipe(replace(/{domain}/, config.packageConfig[server].domain))
         .pipe(gulp.dest(iframeLatestPackageFolder));
 });
