@@ -250,14 +250,15 @@ gulp.task('iframe_whitelist_copy', ['iframe_package_clean'], function() {
 });
 
 
-gulp.task('iframe_package_js', function() {
-    return browserify('./package/iframe/js/main.js')
+gulp.task('iframe_package_js', function(done) {
+    browserify('./package/iframe/js/main.js')
         .transform(envify({
             MKT_URL: config.packageConfig[server].domain
         }))
         .bundle()
         .pipe(vinylSource('bundle.js'))
         .pipe(gulp.dest('./package/iframe'));
+    return done();
 });
 
 
