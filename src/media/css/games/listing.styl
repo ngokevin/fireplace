@@ -46,8 +46,7 @@
     background: $greyscale-white;
     display: flex;
     flex-direction: column;
-    height: 300px;
-    padding: 30px 30px 40px;
+    padding: 10px 0;
     width: 100%;
 
     +media--base-desktop() {
@@ -61,25 +60,30 @@
         list-style: none;
         font-weight: 600;
         transition: background .1s;
-        width: fit-content;
+        width: 100%;
 
         a {
             background: none;
-            border-radius: 10px;
             color: $greyscale-black;
             display: inline-block;
             font-size: 20px;
-            margin: 6px 0;
-            padding: 5px 10px;
+            margin: 5px 0;
+            padding: 10px 30px;
             transition: color .1s;
+            width: 100%;
         }
         &:hover,
         &[data-active="true"] {
             a {
-                background: $action-positive;
                 color: $greyscale-white;
                 text-decoration: none;
             }
+        }
+        &:hover a {
+            background: $action-positive-hover;
+        }
+        &[data-active="true"] a {
+            background: $action-positive;
         }
     }
 }
